@@ -1,7 +1,7 @@
 import sys, pygame
 from turtle import window_width
 from Text import text
-from file_func import read_file
+from file_func import create_file, file_exists, write_on_file, read_file
 
 class menu:
     def __init__(self):
@@ -60,6 +60,9 @@ class menu:
 
     def menu_loop(self, function):
         pygame.display.set_caption("Space Invaders")
+        if not(file_exists("hi_score.txt")):
+            create_file("hi_score.txt")
+            write_on_file("0", "hi_score.txt")
         hi_score = read_file("hi_score.txt")
         self.add_text(text(f"SCORE: 0", 120, 60, (0,255,255), (0,0,0), self.font_type, 45))
         self.add_text(text(f"HI-SCORE: {hi_score}", 470, 60, (0,0,255), (0,0,0), self.font_type, 45))
@@ -67,9 +70,9 @@ class menu:
         self.add_text(text("SPACE INVADERS", self.window_width / 2, 300, (0,255,0), (0,0,0), self.font_type, 80))
         self.add_text(text("*SCORE ADVANCE TABLE*", self.window_width / 2, 440, (0, 255, 255), (0,0,0), self.font_type, 40))
         
-        self.add_image("Enemy2pos1red.png", self.window_width / 2 - 111, 490)
-        self.add_image("Enemy1pos1pink.png", self.window_width / 2 - 111, 540)
-        self.add_image("Enemy3pos1green.png", self.window_width / 2 - 111, 590)
+        self.add_image("Sprites/Enemy2pos1red.png", self.window_width / 2 - 111, 490)
+        self.add_image("Sprites/Enemy1pos1pink.png", self.window_width / 2 - 111, 540)
+        self.add_image("Sprites/Enemy3pos1green.png", self.window_width / 2 - 111, 590)
         
         self.add_text(text("= 30 POINTS", self.window_width / 2 + 22, 490, (255,0,0), (0,0,0), self.font_type, 40))
         self.add_text(text("= 20 POINTS", self.window_width / 2 + 22, 540, (255,0,255), (0,0,0), self.font_type, 40))

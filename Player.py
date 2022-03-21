@@ -6,7 +6,7 @@ class player:
     def __init__(self, x, y):
         self.scale = 3
         self.lifes = 4
-        self.sprite = pygame.transform.scale(pygame.image.load("PlayerSpritev2.png"), (11 * self.scale, 6 * self.scale))
+        self.sprite = pygame.transform.scale(pygame.image.load("Sprites/PlayerSpritev2.png"), (11 * self.scale, 6 * self.scale))
         self.rect = self.sprite.get_rect().move((x, y))
         self.x = x
         self.y = y

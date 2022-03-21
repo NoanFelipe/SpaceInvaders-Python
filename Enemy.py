@@ -9,7 +9,7 @@ class enemy:
         self.color = "green"
         self.bullet_color = (255,255,255)
         self.current_sprite = 1
-        self.sprite = pygame.transform.scale(pygame.image.load(f"Enemy{self.type}pos{self.current_sprite}{self.color}.png"), (11 * self.scale, 8 * self.scale))
+        self.sprite = pygame.transform.scale(pygame.image.load(f"Sprites/Enemy{self.type}pos{self.current_sprite}{self.color}.png"), (11 * self.scale, 8 * self.scale))
         self.rect = self.sprite.get_rect().move((x, y))
         self.life = 1
         self.timer = 0
@@ -40,7 +40,7 @@ class enemy:
         if self.current_sprite > 2:
             self.current_sprite = 1
         
-        self.sprite =  pygame.transform.scale(pygame.image.load(f"Enemy{self.type}pos{self.current_sprite}{self.color}.png"), (11 * self.scale, 8 * self.scale))
+        self.sprite =  pygame.transform.scale(pygame.image.load(f"Sprites/Enemy{self.type}pos{self.current_sprite}{self.color}.png"), (11 * self.scale, 8 * self.scale))
 
         window.blit(self.sprite, self.rect)
     
