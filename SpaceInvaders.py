@@ -6,6 +6,7 @@ from Text import text
 from file_func import create_file, file_exists, write_on_file, read_file
 from Wall import wall
 from Menu import menu
+import SoundEffect
 
 pygame.init()
 
@@ -57,7 +58,7 @@ def draw_game_window(window, bullets, enemies, enemy_bullets, texts, score, hi_s
     Player.draw(window)
     pygame.display.update()
 
-def check_for_bullets(bullets, enemies): #checks if bullet hit the wall and if bullet hit enemy
+def check_for_bullets(bullets, enemies, se): #checks if bullet hit the wall and if bullet hit enemy
     score = 0
     for bullet in bullets:
         if bullet.y > 150 and bullet.y < window_height:
@@ -74,6 +75,8 @@ def check_for_bullets(bullets, enemies): #checks if bullet hit the wall and if b
                         if enemy[1].life <= 0:
                             score += enemies[enemies.index(column)][column.index(enemy)][2]
                             enemies[enemies.index(column)].pop(enemies[enemies.index(column)].index(enemy))
+                            se.timerLength -= 1
+                            se.invaderKilled.play()
                             if len(column) == 0:
                                 enemies.pop(enemies.index(column))
                             update_columns_list(enemies)
@@ -160,7 +163,8 @@ def update_enemy_speed(enemies): # updates enemy speed every time one enemy dies
             enemy[1].timer_length *= 0.97
             if len(enemies) == 1:
                 if len(column) == 1:
-                    enemy[1].timer_length = 1.5
+                    enemy[1].speed *= 1.3
+                    enemy[1].timer_length = 2
 
 def update_shooter(enemies): # sets "is_shooter" value based on the value in enemies list
     for column in enemies:
@@ -247,6 +251,7 @@ def game_loop():
     global Player
     global clock
     global window
+    global se
     texts = []
     score = 0
     if not(file_exists("hi_score.txt")):
@@ -262,11 +267,13 @@ def game_loop():
     can_move_down_timer = 60
     won_counter = 0
     enemies = create_enemies(won_counter)
+    se = SoundEffect.SoundEffect()
     while True:
+        se.playSong()
         draw_game_window(window, bullets, enemies, enemy_bullets, texts, score, hi_score, walls)
         check_for_inputs(bullets)
         check_if_bullet_hit_bullet(enemy_bullets, bullets)
-        score += check_for_bullets(bullets, enemies)
+        score += check_for_bullets(bullets, enemies, se)
         check_enemy_bullets(bullets, enemy_bullets, Player)
         check_wall_colliding_with_enemies(walls, enemies)
         if bullets != []:
@@ -291,9 +298,15 @@ def game_loop():
             can_move_down_timer = 0
         
         check_if_bullet_hit_bullet(enemy_bullets, bullets)
+
         if check_for_win(enemies):
             if won_counter < 3:
                 won_counter += 1
+
+            se.timer = 59
+            se.timerLength = 60
+            se.currentSongIndex = 3
+
             walls = create_walls()
             bullets = []
             enemy_bullets = []

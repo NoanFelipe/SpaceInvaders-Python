@@ -1,6 +1,6 @@
-from turtle import window_width
 import pygame
 from Bullet import bullet
+import SoundEffect
 
 class player:
     def __init__(self, x, y):
@@ -11,6 +11,7 @@ class player:
         self.x = x
         self.y = y
         self.speed = 2.5
+        self.se = SoundEffect.SoundEffect()
 
     def draw(self, window):
         window.blit(self.sprite, self.rect)
@@ -28,5 +29,6 @@ class player:
     def shoot(self, bullets):
         if len(bullets) < 1:
             """print("Olá")"""
+            self.se.shoot.play()
             bullets.append(bullet(self.x, self.y, (0,0,0)))
 
