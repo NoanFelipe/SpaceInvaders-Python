@@ -52,7 +52,7 @@ def draw_game_window(window, bullets, enemies, enemy_bullets, texts, score, hi_s
         for enemy in column:
             enemy[1].draw(window)
     for lifes in range(0, Player.lifes - 1):
-        window.blit(Player.sprite, ((50 + 40 * lifes, window_height - 35), (11 * Player.scale, 6 * Player.scale)))
+        window.blit(Player.sprite, ((50 + 50 * lifes, window_height - 35), (11 * Player.scale, 6 * Player.scale)))
     #pygame.draw.line(window, (255,0,0), (0, window_height - 50), (window_width, window_height - 50))
     
     Player.draw(window)
@@ -69,26 +69,21 @@ def check_for_bullets(bullets, enemies, se): #checks if bullet hit the wall and 
         for column in enemies:
             for enemy in column:
                 for bullet in bullets:
-                    if is_colliding(bullet.rect, enemy[1].rect):
+                    if is_colliding(bullet.rect, enemy[1].rect) and not enemy[1].has_died:
                         bullets.pop(bullets.index(bullet))
                         enemy[1].life -= 1
                         if enemy[1].life <= 0:
+                            
                             score += enemies[enemies.index(column)][column.index(enemy)][2]
-                            enemies[enemies.index(column)].pop(enemies[enemies.index(column)].index(enemy))
-                            se.timerLength -= 1
-                            se.invaderKilled.play()
-                            if len(column) == 0:
-                                enemies.pop(enemies.index(column))
-                            update_columns_list(enemies)
+                            enemies[enemies.index(column)][column.index(enemy)][1].kill(se)
                             update_enemy_speed(enemies)
-                            update_shooter(enemies)
     
     return score
 
-def check_enemy_bullets(player_bullets, enemy_bullets, Player): #checks if enemy bullet hit the wall or the player
+def check_enemy_bullets(enemy_bullets, Player): #checks if enemy bullet hit the wall or the player
     for enemy_bullet in enemy_bullets:
         if is_colliding(enemy_bullet.rect, Player.rect):
-            Player.lifes -= 1
+            Player.damage()
             enemy_bullets.pop(enemy_bullets.index(enemy_bullet))
 
         if enemy_bullet.y > 0 and enemy_bullet.y < window_height - 60:
@@ -103,7 +98,7 @@ def check_if_bullet_hit_bullet(enemy_bullets, player_bullets):
                 enemy_bullets.pop(enemy_bullets.index(enemy_bullet))
                 player_bullets.pop(player_bullets.index(player_bullet))
 
-def enemy_hit_wall(enemies): #checks if one enemy hits the wall, and returns boolean value 
+def enemy_hit_border(enemies): #checks if one enemy hits the border of the screen, and returns boolean value 
     hit = False
     wall_distance = 25
     for column in enemies:
@@ -251,7 +246,7 @@ def game_loop():
     global Player
     global clock
     global window
-    global se
+    global se 
     texts = []
     score = 0
     if not(file_exists("hi_score.txt")):
@@ -259,7 +254,7 @@ def game_loop():
         write_on_file("0", "hi_score.txt")
     hi_score = read_file("hi_score.txt")
     texts.append(text(f"SCORE: {score}", 120, 60, (0,255,255), (0,0,0), "pixelated.ttf", 45))
-    texts.append(text(f"{Player.lifes}", 25, 876, (0,255,0), (0,0,0), "pixelated.ttf", 28))
+    texts.append(text(f"{Player.lifes}", 25, 876, (0,255,255), (0,0,0), "pixelated.ttf", 28))
     texts.append(text(f"HI-SCORE: {hi_score}", 470, 60, (0,0,255), (0,0,0), "pixelated.ttf", 45))
     bullets = []
     enemy_bullets = []
@@ -274,7 +269,7 @@ def game_loop():
         check_for_inputs(bullets)
         check_if_bullet_hit_bullet(enemy_bullets, bullets)
         score += check_for_bullets(bullets, enemies, se)
-        check_enemy_bullets(bullets, enemy_bullets, Player)
+        check_enemy_bullets(enemy_bullets, Player)
         check_wall_colliding_with_enemies(walls, enemies)
         if bullets != []:
             check_wall_colliding_with_bullet(walls, bullets)
@@ -283,7 +278,7 @@ def game_loop():
         
 
         if can_move_down_timer == 60:
-            enemy_move_down = enemy_hit_wall(enemies)
+            enemy_move_down = enemy_hit_border(enemies)
         else:
             can_move_down_timer += 1
 
@@ -292,6 +287,8 @@ def game_loop():
                 enemy[1].check_move_down(enemies)
                 enemy[1].move(enemy_move_down, Player.x)
                 enemy[1].shoot(enemy_bullets)
+                if enemy[1].has_died:
+                    enemy[1].deathTimer(enemies, [enemies.index(column), column.index(enemy)], update_columns_list, update_shooter)
 
         if enemy_move_down:
             enemy_move_down = False

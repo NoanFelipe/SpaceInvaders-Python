@@ -12,8 +12,18 @@ class enemy:
         self.sprite = pygame.transform.scale(pygame.image.load(f"Sprites/Enemy{self.type}pos{self.current_sprite}{self.color}.png"), (11 * self.scale, 8 * self.scale))
         self.rect = self.sprite.get_rect().move((x, y))
         self.life = 1
+        self.has_died = False
+
+        self.death_timer_length = 8
+        self.death_timer = 0
+
         self.timer = 0
         self.timer_length = 40
+
+        self.has_shot = False
+        self.has_shot_timer = 0
+        self.has_shot_timer_length = 10
+        
         self.dir = 1
         self.is_shooter = False
         self.can_move_down = True
@@ -21,36 +31,68 @@ class enemy:
         self.speed = 4
 
     def draw(self, window):
-        if self.rect[1] == 295-20 or self.rect[1] == 340-20:
-            self.color = "green"
-            self.bullet_color = (0, 255, 0)
-        elif self.rect[1] == 385-20 or self.rect[1] == 430-20:
-            self.color = "cyan"
-            self.bullet_color = (0, 255, 255)
-        elif self.rect[1] == 475-20 or self.rect[1] == 520-20:
-            self.color = "pink"
-            self.bullet_color = (255, 0 ,255)
-        elif self.rect[1] == 565-20 or self.rect[1] == 610-20:
-            self.color = "yellow"
-            self.bullet_color = (255, 255, 0)
-        elif self.rect[1] >= 655-20:
-            self.color = "red"
-            self.bullet_color = (255, 0, 0)
+        if not self.has_died:
+            if self.rect[1] == 295-20 or self.rect[1] == 340-20:
+                self.color = "green"
+                self.bullet_color = (0, 255, 0)
+            elif self.rect[1] == 385-20 or self.rect[1] == 430-20:
+                self.color = "cyan"
+                self.bullet_color = (0, 255, 255)
+            elif self.rect[1] == 475-20 or self.rect[1] == 520-20:
+                self.color = "pink"
+                self.bullet_color = (255, 0 ,255)
+            elif self.rect[1] == 565-20 or self.rect[1] == 610-20:
+                self.color = "yellow"
+                self.bullet_color = (255, 255, 0)
+            elif self.rect[1] >= 655-20:
+                self.color = "red"
+                self.bullet_color = (255, 0, 0)
 
-        if self.current_sprite > 2:
-            self.current_sprite = 1
-        
-        self.sprite =  pygame.transform.scale(pygame.image.load(f"Sprites/Enemy{self.type}pos{self.current_sprite}{self.color}.png"), (11 * self.scale, 8 * self.scale))
+            if self.current_sprite > 2:
+                self.current_sprite = 1
+            
+            self.sprite = pygame.transform.scale(pygame.image.load(f"Sprites/Enemy{self.type}pos{self.current_sprite}{self.color}.png"), (11 * self.scale, 8 * self.scale))
 
         window.blit(self.sprite, self.rect)
     
     def shoot(self, enemy_bullets):
-        chance_of_shooting = randint(0, 350)
-        if chance_of_shooting == 7:
-            if self.is_shooter:
-                if len(enemy_bullets) < 3:
+        if self.has_died: return
+        if not self.is_shooter: return
+        
+        if self.has_shot:
+            self.has_shot_timer += 1
+            if self.has_shot_timer > self.has_shot_timer_length:
+                self.has_shot = False
+                self.has_shot_timer = 0
+
+        if not self.has_shot:
+            chance_of_shooting = randint(0, 350)
+            if chance_of_shooting == 7:
+                if len(enemy_bullets) <= 3:
                     """print("Olá")"""
+                    self.has_shot = True
                     enemy_bullets.append(bullet(self.rect[0], self.rect[1] + 10 * self.scale, self.bullet_color))
+
+    # sets "has_died" variable to True, sets sprite to explosion, plays invaderKilled soundEffect and speeds up music
+    def kill(self, se):
+        se.timerLength -= 1
+        se.invaderKilled.play()
+        
+        self.rect[0] -= 6
+        self.sprite = pygame.transform.scale(pygame.image.load(f"Sprites/explosion{self.color}.png"), (16 * self.scale, 8 * self.scale))
+
+        self.has_died = True
+
+    # after function "kill", this one makes a timer and than after the time is up removes enemy from "enemies" list
+    def deathTimer(self, enemies, index, update_columns_list, update_shooter):
+        if self.death_timer > self.death_timer_length:
+            enemies[index[0]].pop(index[1])
+            if len(enemies[index[0]]) == 0:
+                enemies.pop(index[0])
+            update_columns_list(enemies)
+            update_shooter(enemies)
+                    
+        self.death_timer += 1
 
     def check_move_down(self, enemies_list): #checks if enemy is on the players "layer" and changes enemy "dir" and "can_move_down" variables
         can_move = True
@@ -64,8 +106,9 @@ class enemy:
                     enemy[1].can_move_down = False
 
     def move(self, enemy_hit_wall, player_x):
+        if self.has_died: return
         self.timer += 1
-
+        
         if not(self.is_on_player_layer):
             if enemy_hit_wall:
                 enemy_hit_wall = False
@@ -80,6 +123,7 @@ class enemy:
                     self.rect[0] += 5
                 elif self.dir == 2:
                     self.rect[0] -= 5
+        # if enemy is on player layer, dir is defined by the players x position
         else:
             if player_x > self.rect[0]:
                 self.dir = 1
