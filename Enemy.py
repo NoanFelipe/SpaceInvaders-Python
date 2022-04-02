@@ -17,7 +17,9 @@ class enemy:
         self.death_timer_length = 8
         self.death_timer = 0
 
-        #is_paused = False
+        self.is_paused = False
+        self.pause_timer_length = 0
+        self.pause_timer = 0
 
         self.timer = 0
         self.timer_length = 40
@@ -58,6 +60,7 @@ class enemy:
 
     def shoot(self, enemy_bullets):
         if not self.is_shooter: return
+        if self.is_paused: return
 
         if self.has_shot:
             self.has_shot_timer += 1
@@ -93,6 +96,14 @@ class enemy:
         self.death_timer += 1
 
     def move(self, enemy_hit_wall, player_x):
+        if self.is_paused:
+            if self.pause_timer > self.pause_timer_length:
+                self.pause_timer = 0
+                self.pause_timer_length = 0
+                self.is_paused = False
+            self.pause_timer += 1
+            return
+
         self.timer += 1
 
         if not(self.is_on_player_layer):

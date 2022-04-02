@@ -34,10 +34,11 @@ def check_for_inputs(bullets): #checks for inputs i think
     elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
         Player.move(1, window_width)
 
-#def pauseEnemies(frames, enemies):
-#    for column in enemies:
-#        for enemy in column:
-#            enemy[1].is_paused = True
+def pauseEnemies(frames, enemies):
+    for column in enemies:
+        for enemy in column:
+            enemy[1].is_paused = True
+            enemy[1].pause_timer_length = frames
 
 def draw_game_window(window, bullets, enemies, enemy_bullets, texts, score, hi_score, walls, deadEnemiesList): 
     global Player
@@ -59,7 +60,7 @@ def draw_game_window(window, bullets, enemies, enemy_bullets, texts, score, hi_s
         for enemy in column:
             enemy[1].draw(window)
     for lifes in range(0, Player.lifes - 1):
-        window.blit(Player.sprite, ((50 + 50 * lifes, window_height - 35), (11 * Player.scale, 6 * Player.scale)))
+        window.blit(pygame.transform.scale(pygame.image.load("Sprites/PlayerSpritev2.png"), (13 * Player.scale, 8 * Player.scale)), ((50 + 50 * lifes, window_height - 35), (13 * Player.scale, 8 * Player.scale)))
     #pygame.draw.line(window, (255,0,0), (0, window_height - 50), (window_width, window_height - 50))
     
     Player.draw(window)
@@ -93,6 +94,8 @@ def check_for_bullets(bullets, enemies, deadEnemies,se): #checks if bullet hit t
                             se.timerLength -= 1
                             se.invaderKilled.play()
 
+                            pauseEnemies(8, enemies)
+
                             #updating normal enemy list stuff after removing enemy from list
                             if len(column) == 0:
                                 enemies.pop(enemies.index(column))
@@ -102,10 +105,10 @@ def check_for_bullets(bullets, enemies, deadEnemies,se): #checks if bullet hit t
     
     return score
 
-def check_enemy_bullets(enemy_bullets, Player): #checks if enemy bullet hit the wall or the player
+def check_enemy_bullets(enemy_bullets, Player, enemies): #checks if enemy bullet hit the wall or the player
     for enemy_bullet in enemy_bullets:
         if is_colliding(enemy_bullet.rect, Player.rect):
-            Player.damage()
+            Player.damage(pauseEnemies, enemies)
             enemy_bullets.pop(enemy_bullets.index(enemy_bullet))
 
         if enemy_bullet.y > 0 and enemy_bullet.y < window_height - 60:
@@ -292,7 +295,7 @@ def game_loop():
         check_for_inputs(bullets)
         check_if_bullet_hit_bullet(enemy_bullets, bullets)
         score += check_for_bullets(bullets, enemies, deadEnemies, se)
-        check_enemy_bullets(enemy_bullets, Player)
+        check_enemy_bullets(enemy_bullets, Player, enemies)
         check_wall_colliding_with_enemies(walls, enemies)
         if bullets != []:
             check_wall_colliding_with_bullet(walls, bullets)
@@ -328,6 +331,8 @@ def game_loop():
             walls = create_walls()
             bullets = []
             enemy_bullets = []
+
+            deadEnemies = []
             enemies = create_enemies(won_counter)
 
         if int(read_file("hi_score.txt")) < score:
