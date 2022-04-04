@@ -40,6 +40,27 @@ def pauseEnemies(frames, enemies):
             enemy[1].is_paused = True
             enemy[1].pause_timer_length = frames
 
+#turns all sprites red, of makes sprites stop being red and going back to normal
+def turnAllRedOn_Off(on_or_off, enemies, texts):
+    # 0 = On
+    # 1 = Off
+    if on_or_off == 0:
+        for column in enemies:
+            for enemy in column:
+                enemy[1].isRed = True
+        for text in texts:
+            text.isRed = True
+        return
+    if on_or_off == 1:
+        for column in enemies:
+            for enemy in column:
+                enemy[1].isRed = False
+        for text in texts:
+            text.isRed = False
+        
+    
+    
+
 def draw_game_window(window, bullets, enemies, enemy_bullets, texts, score, hi_score, walls, deadEnemiesList): 
     global Player
     window.fill((0,0,0))
@@ -60,7 +81,10 @@ def draw_game_window(window, bullets, enemies, enemy_bullets, texts, score, hi_s
         for enemy in column:
             enemy[1].draw(window)
     for lifes in range(0, Player.lifes - 1):
-        window.blit(pygame.transform.scale(pygame.image.load("Sprites/PlayerSpritev2.png"), (13 * Player.scale, 8 * Player.scale)), ((50 + 50 * lifes, window_height - 35), (13 * Player.scale, 8 * Player.scale)))
+        if not Player.was_hit:
+            window.blit(pygame.transform.scale(pygame.image.load("Sprites/PlayerSpritev2.png"), (13 * Player.scale, 8 * Player.scale)), ((50 + 50 * lifes, window_height - 35), (13 * Player.scale, 8 * Player.scale)))
+        else:
+            window.blit(pygame.transform.scale(pygame.image.load("Sprites/PlayerSpritev2red.png"), (13 * Player.scale, 8 * Player.scale)), ((50 + 50 * lifes, window_height - 35), (13 * Player.scale, 8 * Player.scale)))
     #pygame.draw.line(window, (255,0,0), (0, window_height - 50), (window_width, window_height - 50))
     
     Player.draw(window)
@@ -105,10 +129,10 @@ def check_for_bullets(bullets, enemies, deadEnemies,se): #checks if bullet hit t
     
     return score
 
-def check_enemy_bullets(enemy_bullets, Player, enemies): #checks if enemy bullet hit the wall or the player
+def check_enemy_bullets(enemy_bullets, Player, enemies, texts): #checks if enemy bullet hit the wall or the player
     for enemy_bullet in enemy_bullets:
         if is_colliding(enemy_bullet.rect, Player.rect):
-            Player.damage(pauseEnemies, enemies)
+            Player.damage(pauseEnemies, enemies, turnAllRedOn_Off, texts)
             enemy_bullets.pop(enemy_bullets.index(enemy_bullet))
 
         if enemy_bullet.y > 0 and enemy_bullet.y < window_height - 60:
@@ -264,8 +288,12 @@ def check_wall_colliding_with_enemies(walls, enemies):
                                 pixel[0] = 0
 
 
-def reset_player_lifes(Player):
+def reset_player_variables(Player):
     Player.lifes = 4
+    Player.was_hit = False
+    Player.not_draw = False
+    Player.x = 322
+    Player.rect[0] = 322
 
 def game_loop():
     global Player
@@ -295,7 +323,7 @@ def game_loop():
         check_for_inputs(bullets)
         check_if_bullet_hit_bullet(enemy_bullets, bullets)
         score += check_for_bullets(bullets, enemies, deadEnemies, se)
-        check_enemy_bullets(enemy_bullets, Player, enemies)
+        check_enemy_bullets(enemy_bullets, Player, enemies, texts)
         check_wall_colliding_with_enemies(walls, enemies)
         if bullets != []:
             check_wall_colliding_with_bullet(walls, bullets)
@@ -311,7 +339,7 @@ def game_loop():
         for column in enemies:
             for enemy in column:
                 enemy[1].check_move_down(enemies)
-                enemy[1].move(enemy_move_down, Player.x)
+                enemy[1].move(enemy_move_down, Player.x, texts)
                 enemy[1].shoot(enemy_bullets)
 
         if enemy_move_down:
@@ -340,7 +368,16 @@ def game_loop():
             hi_score = score
 
         if check_for_game_over(Player, enemies):
-            reset_player_lifes(Player)
+            reset_player_variables(Player)
+            turnAllRedOn_Off(1, enemies, texts)
+            enemies = create_enemies(won_counter)
+            walls = create_walls()
+            for t in texts:
+                t.isRed = False
+            bullets = []
+            enemy_bullets = []
+            deadEnemies = []
+
             Menu.game_over = True
             Menu.menu_loop(game_loop)
         

@@ -5,6 +5,7 @@ class text:
         self.x = x
         self.y = y
         self.color = color
+        self.isRed = False
         self.background_color = background_color
         self.font_size = font_size
         self.font_type = font_type
@@ -17,4 +18,7 @@ class text:
         window.blit(self.text, self.textRect)
     
     def update_text(self, new_text):
-        self.text = self.font.render(new_text, True, self.color, self.background_color)
+        if not self.isRed:
+            self.text = self.font.render(new_text, True, self.color, self.background_color)
+        else:
+            self.text = self.font.render(new_text, True, (255,0,0), self.background_color)

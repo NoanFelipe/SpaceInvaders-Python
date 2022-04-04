@@ -15,7 +15,7 @@ class menu:
         self.images = []
         self.game_over = False
         self.game_over_texts = [
-            text("YOU SUCK", self.window_width / 2, self.window_height / 2 - 100, (255,0,0), (0,0,0), self.font_type, 120),
+            text("YOU SUCK", self.window_width / 2 + 7, self.window_height / 2 - 100, (255,0,0), (0,0,0), self.font_type, 120),
             text("PRESS ENTER TO GO BACK TO THE MENU", self.window_width / 2, self.window_height / 2 + 50, (255,0,0), (0,0,0), self.font_type, 40)
         ]
     

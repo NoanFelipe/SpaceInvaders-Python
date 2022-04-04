@@ -62,9 +62,10 @@ class player:
             self.se.shoot.play()
             bullets.append(bullet(self.x, self.y, (0,0,0)))
     
-    def damage(self, pauseEnemies, enemies):
+    def damage(self, pauseEnemies, enemies, turnAllRedOn_Off, texts):
         if self.was_hit: return
         
+        turnAllRedOn_Off(0, enemies, texts)
         pauseEnemies(self.was_hit_timer_length, enemies)
         self.se.explosion.play()
         self.was_hit = True

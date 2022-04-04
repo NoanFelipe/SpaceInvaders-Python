@@ -17,6 +17,8 @@ class enemy:
         self.death_timer_length = 8
         self.death_timer = 0
 
+        self.isRed = False
+
         self.is_paused = False
         self.pause_timer_length = 0
         self.pause_timer = 0
@@ -55,6 +57,9 @@ class enemy:
             self.current_sprite = 1
         
         self.sprite =  pygame.transform.scale(pygame.image.load(f"Sprites/Enemy{self.type}pos{self.current_sprite}{self.color}.png"), (11 * self.scale, 8 * self.scale))
+
+        if self.isRed:
+            self.sprite =  pygame.transform.scale(pygame.image.load(f"Sprites/Enemy{self.type}pos{self.current_sprite}red.png"), (11 * self.scale, 8 * self.scale))
 
         window.blit(self.sprite, self.rect)
 
@@ -95,12 +100,16 @@ class enemy:
         window.blit(self.sprite, self.rect)
         self.death_timer += 1
 
-    def move(self, enemy_hit_wall, player_x):
+    def move(self, enemy_hit_wall, player_x, texts):
         if self.is_paused:
             if self.pause_timer > self.pause_timer_length:
                 self.pause_timer = 0
                 self.pause_timer_length = 0
                 self.is_paused = False
+                if self.isRed:
+                    self.isRed = False
+                for text in texts:
+                    text.isRed = False
             self.pause_timer += 1
             return
 
