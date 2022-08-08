@@ -12,7 +12,7 @@ pip install pygame
 
 You can compile the game from the command line typing:
 ```
-python SpaceInvaders.py
+python3 SpaceInvaders.py
 ```
 
 
