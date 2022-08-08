@@ -1,8 +1,5 @@
-# SpaceInvaders-Python
-Remake of the classic space invaders game made using Python and pygame
-
 # SpaceInvaders made in Python
-Snake Game made in python using Pygame.
+Remake of the classic space invaders game made using Python and Pygame.
 
 ## How to Run
 
