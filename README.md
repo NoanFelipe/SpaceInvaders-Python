@@ -17,6 +17,8 @@ You can compile the game from the command line typing:
 python3 SpaceInvaders.py
 ```
 
+## Youtube Video
+https://youtu.be/SRr7Jtiu1Qo
 
 ## Screenshots
 <div>
