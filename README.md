@@ -20,8 +20,8 @@ python3 SpaceInvaders.py
 
 ## Screenshots
 <div>
-  <img src="https://github.com/NoanFelipe/SpaceInvaders-Python/blob/main/Screenshots/Menu.png" width='250' height='250'>
-  <img src="https://github.com/NoanFelipe/SpaceInvaders-Python/blob/main/Screenshots/RandomGameplay.png" width="250" height="250">
-  <img src="https://github.com/NoanFelipe/SpaceInvaders-Python/blob/main/Screenshots/DeathScreen.png" width="250" height="250">
-  <img src="https://github.com/NoanFelipe/SpaceInvaders-Python/blob/main/Screenshots/GameOverScreen.PNG" width="250" height="250">
+  <img src="https://github.com/NoanFelipe/SpaceInvaders-Python/blob/main/Screenshots/Menu.png" width='300' height='225'>
+  <img src="https://github.com/NoanFelipe/SpaceInvaders-Python/blob/main/Screenshots/RandomGameplay.png" width="300" height="225">
+  <img src="https://github.com/NoanFelipe/SpaceInvaders-Python/blob/main/Screenshots/DeathScreen.png" width="300" height="225">
+  <img src="https://github.com/NoanFelipe/SpaceInvaders-Python/blob/main/Screenshots/GameOverScreen.PNG" width="300" height="225">
 </div>
