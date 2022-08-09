@@ -1,4 +1,3 @@
-from tkinter import Scale
 import pygame
 
 class bullet:

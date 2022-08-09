@@ -1,5 +1,4 @@
 import sys, pygame
-from turtle import window_width
 from Text import text
 from file_func import create_file, file_exists, write_on_file, read_file
 
